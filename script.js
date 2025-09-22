@@ -4,7 +4,7 @@ const CONFIG = {
     overleafProjectUrl: 'https://www.overleaf.com/project/64e59dded3b340f0eb5e921b',
     
     // Alternative: Direct LaTeX file URL (if you export from Overleaf)
-    latexFileUrl: '', // Will be set up after you export from Overleaf
+    latexFileUrl: 'https://raw.githubusercontent.com/sepehr-mousaviyan/cv-website/main/sample-cv.tex', // Sample CV file
     
     // GitHub Pages configuration
     githubPagesUrl: 'https://sepehr-mousaviyan.github.io/cv-website',
