@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sepehr-mousaviyan/cv-website.git"
+    "url": "git+https://github.com/sepehr-mousaviyan/cv.git"
   },
   "keywords": [
     "cv",
@@ -25,9 +25,9 @@
   "author": "Your Name",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sepehr-mousaviyan/cv-website/issues"
+    "url": "https://github.com/sepehr-mousaviyan/cv/issues"
   },
-  "homepage": "https://sepehr-mousaviyan.github.io/cv-website",
+  "homepage": "https://sepehr-mousaviyan.github.io/cv",
   "devDependencies": {
     "http-server": "^14.1.1",
     "html-validate": "^8.7.4"
