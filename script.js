@@ -4,10 +4,10 @@ const CONFIG = {
     overleafProjectUrl: 'https://www.overleaf.com/project/64e59dded3b340f0eb5e921b',
     
     // Alternative: Direct LaTeX file URL (if you export from Overleaf)
-    latexFileUrl: 'https://raw.githubusercontent.com/sepehr-mousaviyan/cv-website/main/v1_Sepehr_s_Resume/shape.tex', // Sepehr's actual CV
+    latexFileUrl: 'https://raw.githubusercontent.com/sepehr-mousaviyan/cv/main/v1_Sepehr_s_Resume/shape.tex', // Sepehr's actual CV
     
     // GitHub Pages configuration
-    githubPagesUrl: 'https://sepehr-mousaviyan.github.io/cv-website',
+    githubPagesUrl: 'https://sepehr-mousaviyan.github.io/cv',
     
     // Update interval in milliseconds (24 hours)
     updateInterval: 24 * 60 * 60 * 1000
@@ -80,28 +80,32 @@ class CVLoader {
     }
 
     parseLatexToHTML(latexContent) {
-        // This is a basic LaTeX to HTML parser
-        // For production use, consider using a more robust solution like LaTeX.js
-        
+        // Enhanced LaTeX to HTML parser
         let html = latexContent;
         
-        // Remove LaTeX document structure
+        // Remove LaTeX document structure and packages
         html = html.replace(/\\documentclass\{[^}]+\}/g, '');
+        html = html.replace(/\\usepackage\{[^}]+\}/g, '');
+        html = html.replace(/\\usepackage\[[^\]]*\]\{[^}]+\}/g, '');
         html = html.replace(/\\begin\{document\}/g, '');
         html = html.replace(/\\end\{document\}/g, '');
-        html = html.replace(/\\usepackage\{[^}]+\}/g, '');
+        html = html.replace(/\\pagestyle\{[^}]+\}/g, '');
+        html = html.replace(/\\setlength\{[^}]+\}\{[^}]+\}/g, '');
+        html = html.replace(/\\setlist\{[^}]+\}/g, '');
+        html = html.replace(/\\definecolor\{[^}]+\}\{[^}]+\}\{[^}]+\}/g, '');
+        html = html.replace(/\\titleformat\{[^}]+\}\{[^}]+\}\{[^}]+\}\{[^}]+\}\{[^}]+\}/g, '');
         
-        // Convert common LaTeX commands to HTML
-        html = html.replace(/\\section\{([^}]+)\}/g, '<h2>$1</h2>');
-        html = html.replace(/\\subsection\{([^}]+)\}/g, '<h3>$1</h3>');
-        html = html.replace(/\\subsubsection\{([^}]+)\}/g, '<h4>$1</h4>');
+        // Convert sections
+        html = html.replace(/\\section\*\{([^}]+)\}/g, '<h2>$1</h2>');
+        html = html.replace(/\\subsection\*\{([^}]+)\}/g, '<h3>$1</h3>');
+        html = html.replace(/\\subsubsection\*\{([^}]+)\}/g, '<h4>$1</h4>');
         
-        // Convert itemize to HTML lists
+        // Convert itemize lists
         html = html.replace(/\\begin\{itemize\}/g, '<ul>');
         html = html.replace(/\\end\{itemize\}/g, '</ul>');
-        html = html.replace(/\\item\s+([^\n]+)/g, '<li>$1</li>');
+        html = html.replace(/\\item\s*([^\n]*)/g, '<li>$1</li>');
         
-        // Convert enumerate to HTML lists
+        // Convert enumerate lists
         html = html.replace(/\\begin\{enumerate\}/g, '<ol>');
         html = html.replace(/\\end\{enumerate\}/g, '</ol>');
         
@@ -109,18 +113,40 @@ class CVLoader {
         html = html.replace(/\\textbf\{([^}]+)\}/g, '<strong>$1</strong>');
         html = html.replace(/\\textit\{([^}]+)\}/g, '<em>$1</em>');
         html = html.replace(/\\emph\{([^}]+)\}/g, '<em>$1</em>');
+        html = html.replace(/\\LARGE\s*([^\n]+)/g, '<h1>$1</h1>');
+        html = html.replace(/\\Large\s*([^\n]+)/g, '<h2>$1</h2>');
+        html = html.replace(/\\large\s*([^\n]+)/g, '<h3>$1</h3>');
         
-        // Convert line breaks
+        // Convert href links
+        html = html.replace(/\\href\{([^}]+)\}\{([^}]+)\}/g, '<a href="$1">$2</a>');
+        
+        // Convert center environment
+        html = html.replace(/\\begin\{center\}/g, '<div style="text-align: center;">');
+        html = html.replace(/\\end\{center\}/g, '</div>');
+        
+        // Convert vspace
+        html = html.replace(/\\vspace\{[^}]+\}/g, '<br>');
+        
+        // Convert line breaks and paragraphs
         html = html.replace(/\\\\/g, '<br>');
-        html = html.replace(/\n\n/g, '</p><p>');
+        html = html.replace(/\n\n+/g, '</p><p>');
         html = html.replace(/\n/g, '<br>');
+        
+        // Clean up LaTeX comments
+        html = html.replace(/%[^\n]*/g, '');
         
         // Wrap in paragraphs
         html = '<p>' + html + '</p>';
         
-        // Clean up empty paragraphs
+        // Clean up empty paragraphs and fix formatting
         html = html.replace(/<p><\/p>/g, '');
         html = html.replace(/<p>\s*<\/p>/g, '');
+        html = html.replace(/<p>\s*<h/g, '<h');
+        html = html.replace(/<\/h([1-6])>\s*<\/p>/g, '</h$1>');
+        html = html.replace(/<p>\s*<ul>/g, '<ul>');
+        html = html.replace(/<\/ul>\s*<\/p>/g, '</ul>');
+        html = html.replace(/<p>\s*<ol>/g, '<ol>');
+        html = html.replace(/<\/ol>\s*<\/p>/g, '</ol>');
         
         return html;
     }
