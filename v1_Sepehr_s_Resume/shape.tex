@@ -1,0 +1,160 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[left=1in, right=1in, top=1in, bottom=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fontawesome}
+\usepackage{amsmath}
+
+% Defining colors
+\definecolor{fontcolor}{RGB}{0,0,0}
+
+% Formatting section titles
+\titleformat{\section}
+  {\color{fontcolor}\Large\bfseries}
+  {}
+  {0em}
+  {}[\titlerule]
+
+% Setting paragraph and list properties
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+\setlist[itemize]{leftmargin=*}
+
+\begin{document}
+
+\pagestyle{empty}
+
+% Creating header with contact information
+\begin{center}
+  \textbf{\LARGE Seyed Sepehr Mousaviyan} \\
+  \vspace{0.2em}
+  \small
+  \faEnvelope~\href{mailto:mousaviy@uci.edu}{mousaviy@uci.edu} \quad
+  \faGithub~\href{https://github.com/sepehr-mousaviyan}{sepehr-mousaviyan} \quad
+  \faLinkedin~\href{https://linkedin.com/in/sepehr-mousaviyan}{sepehr-mousaviyan}
+\end{center}
+
+% Defining research interests
+\section*{Research Interests}
+Mid-Level Vision, Cognition, Computer Vision, Image Processing, Machine Learning
+
+% Listing educational background
+\section*{Education}
+\textbf{\href{https://www.uci.edu/}{University of California, Irvine}}\hfill September 2024 -- Present
+\vspace{-0.5em}
+\begin{itemize}
+  \item Ph.D. in Cognitive Sciences (Expected 2029)
+  \item Advisor: \href{https://www.cogsci.uci.edu/people/pizlo/}{Dr. Zygmunt Pizlo}, \href{https://www.viperlab.net/}{ViPER Lab}
+  \item Research focus: 3D shape perception and scene parsing using mid-level vision cues
+\end{itemize}
+
+\textbf{\href{https://en.sbu.ac.ir/}{Shahid Beheshti University}, Tehran, Iran}\hfill September 2020 -- June 2024
+\vspace{-0.5em}
+\begin{itemize}
+  \item B.Sc. in Computer Science
+  \item Taking Courses in and research focusing on cryptography, Data base, and Artificial Inteligence
+\end{itemize}
+
+% Detailing research experience
+\section*{Research Experience}
+\textbf{University of California, Irvine, \href{https://www.viperlab.net/}{ViPER Lab}}\hfill Jan 2025 -- Present
+\vspace{-0.5em}
+\begin{itemize}
+  \item \textit{Graduate Research student}, Advisor: Dr. Zygmunt Pizlo
+  \item Developing computational models for 3D shape perception 
+\end{itemize}
+
+\textbf{Institute for Research in Fundamental Sciences & Shahid Beheshti University(collaborative) }\hfill July 2023 -- May 2024
+\vspace{-0.5em}
+\begin{itemize}
+  \item \textit{Visual Cognition Research Assistant}, Advisor: Prof. Rezvani
+  \item Applied image processing (OpenCV) to integrate gaze estimation and facial expression analysis for predicting psychophysical responses in cognitive assessments.
+\end{itemize}
+
+% Presenting conference contributions
+\section*{Presentations}
+\textbf{Online Smart Cognitive Assessment Platform}\hfill December 2023
+\vspace{-0.5em}
+\begin{itemize}
+  \item Presented at the 12th Basic and Clinical Neuroscience Congress (BCNC), Iran (\href{https://lnkd.in/d6aYv6Wt}{link})
+  \item Demonstrated an image processing-based platform for accessible, precise cognitive evaluations, enhancing psychophysical testing.
+\end{itemize}
+
+% Outlining teaching roles
+\section*{Teaching Experience}
+\textbf{Shahid Beheshti University, Teaching Assistant}\hfill 2022 -- 2024
+\vspace{-0.5em}
+\begin{itemize}
+  \item Fundamentals of Programming (Computer Engineering and Computer Science, 2 semesters)
+  \item Advanced Programming (Computer Engineering, 1 semester)
+  \item Database Systems (Computer Science, 1 semester)
+\end{itemize}
+
+% Adding work experience
+\section*{Work Experience}
+\textbf{Machine Learning Engineer, \href{https://www.linkedin.com/company/ariandata}{ArianData}, Tehran, Iran}\hfill September 2024 -- December 2024
+\vspace{-0.5em}
+\begin{itemize}
+  \item Developed an automated quality control system for MDF assembly lines using image processing and anomaly detection models (OpenCV, PyTorch). Optimized defect identification to reduce recall rates while ensuring high accuracy, enhancing customer satisfaction.
+  \item Integrated smart inspection systems for real-time monitoring, improving production efficiency.
+\end{itemize}
+
+\textbf{Project Intern, High-Performance Computing, Institute for Research in Fundamental Sciences, Tehran, Iran}\hfill Summer 2023
+\vspace{-0.5em}
+\begin{itemize}
+  \item Customized BOINC software using Docker for in-app job submission, enhancing distributed computing efficiency.
+\end{itemize}
+
+\textbf{Backend Developer Intern, \href{https://www.linkedin.com/company/webhouse-ir/}{WebHouse}, Tehran, Iran}\hfill March 2022 -- June 2022
+\vspace{-0.5em}
+\begin{itemize}
+  \item Developed Kentico CMS applications using .NET framework for web solutions.
+\end{itemize}
+
+% Updating project details
+\section*{Selected Projects}
+\textbf{3D Object Reconstruction with Photometric Stereo}\hfill Spring 2025
+\vspace{-0.5em}
+\begin{itemize}
+  \item Developed a pipeline for 3D reconstruction from multi-view images (DiLiGenT-MV dataset) for CS217A (Prof. Fowlkes). Implemented SIFT feature matching, RANSAC for alignment, and depth map generation using Python, OpenCV, NumPy, and MATLAB, achieving robust shape reconstruction under varying lighting conditions. \href{https://github.com/sepehr-mousaviyan/3D-Object-Reconstruction-with-Photometric-Stereo}{GitHub link}
+\end{itemize}
+
+\textbf{Movie Recommender System}\hfill 2023
+\vspace{-0.5em}
+\begin{itemize}
+  \item Built a recommender using machine learning algorithms, deployed on HuggingFace. \href{https://github.com/sepehr-mousaviyan/Movie_Recommender}{GitHub link}
+\end{itemize}
+
+\textbf{Computational Cognitive Neuroscience Projects}\hfill 2022
+\vspace{-0.5em}
+\begin{itemize}
+  \item Completed three projects modeling neural processes, using Python and MATLAB. \href{https://github.com/sepehr-mousaviyan/ComputationalNeuroscienceProjects}{GitHub link}
+\end{itemize}
+
+% Listing technical and soft skills
+\section*{Skills}
+\subsection*{Programming and Tools}
+\begin{itemize}
+  \item Python (NumPy, Pandas, OpenCV, PyTorch, Scikit-learn, TensorFlow, Keras)
+  \item MATLAB, C/C++, Java, .NET Core (C#), Django
+  \item Computer Vision: SIFT, RANSAC, Photometric Stereo, Depth Estimation
+\end{itemize}
+
+\subsection*{Soft Skills}
+\begin{itemize}
+  \item Collaboration, Problem Solving, Scientific Communication, Project Management
+\end{itemize}
+
+% Including certifications
+\section*{Certifications}
+\begin{itemize}
+  \item Game Theory, Stanford University, Coursera, 2024
+  \item Machine Learning, DeepLearning.AI, Coursera, 2024
+  \item Deep Learning, DeepLearning.AI, Coursera, 2024
+  \item Blockchain and Smart Contracts (Solidity), Sharif ICT, Sharif University of Technology, 2023 (\href{https://ibb.co/R2Zf8kk}{Certificate})
+  \item IELTS 7.0, 2023
+\end{itemize}
+
+\end{document}
