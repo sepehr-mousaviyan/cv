@@ -1,0 +1,39 @@
+{
+  "name": "cv-website",
+  "version": "1.0.0",
+  "description": "A professional CV website that displays LaTeX content from Overleaf",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server -p 8080 -o",
+    "dev": "http-server -p 3000 -o",
+    "build": "echo 'No build step required for static site'",
+    "validate": "html-validate index.html",
+    "test": "echo 'No tests configured'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sepehr-mousaviyan/cv-website.git"
+  },
+  "keywords": [
+    "cv",
+    "resume",
+    "latex",
+    "overleaf",
+    "github-pages",
+    "website"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sepehr-mousaviyan/cv-website/issues"
+  },
+  "homepage": "https://sepehr-mousaviyan.github.io/cv-website",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "html-validate": "^8.7.4"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
+
