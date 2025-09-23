@@ -83,7 +83,7 @@ class CVLoader {
         // Enhanced LaTeX to HTML parser
         let html = latexContent;
         
-        // Remove LaTeX document structure and packages
+        // Remove LaTeX document structure and packages first
         html = html.replace(/\\documentclass\{[^}]+\}/g, '');
         html = html.replace(/\\usepackage\{[^}]+\}/g, '');
         html = html.replace(/\\usepackage\[[^\]]*\]\{[^}]+\}/g, '');
@@ -95,10 +95,33 @@ class CVLoader {
         html = html.replace(/\\definecolor\{[^}]+\}\{[^}]+\}\{[^}]+\}/g, '');
         html = html.replace(/\\titleformat\{[^}]+\}\{[^}]+\}\{[^}]+\}\{[^}]+\}\{[^}]+\}/g, '');
         
+        // Clean up LaTeX comments
+        html = html.replace(/%[^\n]*/g, '');
+        
+        // Convert center environment first
+        html = html.replace(/\\begin\{center\}/g, '<div style="text-align: center;">');
+        html = html.replace(/\\end\{center\}/g, '</div>');
+        
         // Convert sections
         html = html.replace(/\\section\*\{([^}]+)\}/g, '<h2>$1</h2>');
         html = html.replace(/\\subsection\*\{([^}]+)\}/g, '<h3>$1</h3>');
         html = html.replace(/\\subsubsection\*\{([^}]+)\}/g, '<h4>$1</h4>');
+        
+        // Convert text formatting
+        html = html.replace(/\\textbf\{([^}]+)\}/g, '<strong>$1</strong>');
+        html = html.replace(/\\textit\{([^}]+)\}/g, '<em>$1</em>');
+        html = html.replace(/\\emph\{([^}]+)\}/g, '<em>$1</em>');
+        
+        // Convert font sizes
+        html = html.replace(/\\LARGE\s*([^\n]+)/g, '<h1>$1</h1>');
+        html = html.replace(/\\Large\s*([^\n]+)/g, '<h2>$1</h2>');
+        html = html.replace(/\\large\s*([^\n]+)/g, '<h3>$1</h3>');
+        
+        // Convert href links
+        html = html.replace(/\\href\{([^}]+)\}\{([^}]+)\}/g, '<a href="$1">$2</a>');
+        
+        // Convert vspace
+        html = html.replace(/\\vspace\{[^}]+\}/g, '<br>');
         
         // Convert itemize lists
         html = html.replace(/\\begin\{itemize\}/g, '<ul>');
@@ -109,34 +132,53 @@ class CVLoader {
         html = html.replace(/\\begin\{enumerate\}/g, '<ol>');
         html = html.replace(/\\end\{enumerate\}/g, '</ol>');
         
-        // Convert text formatting
-        html = html.replace(/\\textbf\{([^}]+)\}/g, '<strong>$1</strong>');
-        html = html.replace(/\\textit\{([^}]+)\}/g, '<em>$1</em>');
-        html = html.replace(/\\emph\{([^}]+)\}/g, '<em>$1</em>');
-        html = html.replace(/\\LARGE\s*([^\n]+)/g, '<h1>$1</h1>');
-        html = html.replace(/\\Large\s*([^\n]+)/g, '<h2>$1</h2>');
-        html = html.replace(/\\large\s*([^\n]+)/g, '<h3>$1</h3>');
-        
-        // Convert href links
-        html = html.replace(/\\href\{([^}]+)\}\{([^}]+)\}/g, '<a href="$1">$2</a>');
-        
-        // Convert center environment
-        html = html.replace(/\\begin\{center\}/g, '<div style="text-align: center;">');
-        html = html.replace(/\\end\{center\}/g, '</div>');
-        
-        // Convert vspace
-        html = html.replace(/\\vspace\{[^}]+\}/g, '<br>');
-        
-        // Convert line breaks and paragraphs
+        // Convert line breaks
         html = html.replace(/\\\\/g, '<br>');
-        html = html.replace(/\n\n+/g, '</p><p>');
-        html = html.replace(/\n/g, '<br>');
         
-        // Clean up LaTeX comments
-        html = html.replace(/%[^\n]*/g, '');
+        // Split into lines and process each line
+        let lines = html.split('\n');
+        let processedLines = [];
+        let inList = false;
         
-        // Wrap in paragraphs
-        html = '<p>' + html + '</p>';
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim();
+            
+            // Skip empty lines
+            if (line === '') {
+                if (!inList) {
+                    processedLines.push('<br>');
+                }
+                continue;
+            }
+            
+            // Handle list items
+            if (line.startsWith('<li>') || line.startsWith('<ul>') || line.startsWith('</ul>') || 
+                line.startsWith('<ol>') || line.startsWith('</ol>')) {
+                inList = true;
+                processedLines.push(line);
+                if (line.startsWith('</ul>') || line.startsWith('</ol>')) {
+                    inList = false;
+                }
+                continue;
+            }
+            
+            // Handle headings
+            if (line.startsWith('<h1>') || line.startsWith('<h2>') || line.startsWith('<h3>') || 
+                line.startsWith('<h4>') || line.startsWith('<div')) {
+                inList = false;
+                processedLines.push(line);
+                continue;
+            }
+            
+            // Regular text lines
+            if (!inList && line.length > 0) {
+                processedLines.push('<p>' + line + '</p>');
+            } else if (inList) {
+                processedLines.push(line);
+            }
+        }
+        
+        html = processedLines.join('\n');
         
         // Clean up empty paragraphs and fix formatting
         html = html.replace(/<p><\/p>/g, '');
@@ -147,6 +189,8 @@ class CVLoader {
         html = html.replace(/<\/ul>\s*<\/p>/g, '</ul>');
         html = html.replace(/<p>\s*<ol>/g, '<ol>');
         html = html.replace(/<\/ol>\s*<\/p>/g, '</ol>');
+        html = html.replace(/<p>\s*<div/g, '<div');
+        html = html.replace(/<\/div>\s*<\/p>/g, '</div>');
         
         return html;
     }
