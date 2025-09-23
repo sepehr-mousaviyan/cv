@@ -80,64 +80,28 @@ class CVLoader {
     }
 
     parseLatexToHTML(latexContent) {
-        // Enhanced LaTeX to HTML parser
+        // Aggressive LaTeX to HTML parser - removes ALL LaTeX syntax
         let html = latexContent;
         
-        // Remove LaTeX document structure and packages first
-        html = html.replace(/\\documentclass\{[^}]+\}/g, '');
-        html = html.replace(/\\usepackage\{[^}]+\}/g, '');
-        html = html.replace(/\\usepackage\[[^\]]*\]\{[^}]+\}/g, '');
-        html = html.replace(/\\begin\{document\}/g, '');
-        html = html.replace(/\\end\{document\}/g, '');
-        html = html.replace(/\\pagestyle\{[^}]+\}/g, '');
-        html = html.replace(/\\setlength\{[^}]+\}\{[^}]+\}/g, '');
-        html = html.replace(/\\setlist\{[^}]+\}/g, '');
-        html = html.replace(/\\definecolor\{[^}]+\}\{[^}]+\}\{[^}]+\}/g, '');
-        html = html.replace(/\\titleformat\{[^}]+\}\{[^}]+\}\{[^}]+\}\{[^}]+\}\{[^}]+\}/g, '');
+        // Remove ALL LaTeX commands and environments
+        html = html.replace(/\\[a-zA-Z]+\{[^}]*\}/g, ''); // Remove \command{content}
+        html = html.replace(/\\[a-zA-Z]+\[[^\]]*\]\{[^}]*\}/g, ''); // Remove \command[options]{content}
+        html = html.replace(/\\[a-zA-Z]+/g, ''); // Remove remaining \commands
+        html = html.replace(/\\begin\{[^}]+\}/g, ''); // Remove \begin{environment}
+        html = html.replace(/\\end\{[^}]+\}/g, ''); // Remove \end{environment}
+        html = html.replace(/\\[^a-zA-Z]/g, ''); // Remove remaining \symbols
         
         // Clean up LaTeX comments
         html = html.replace(/%[^\n]*/g, '');
         
-        // Convert center environment first
-        html = html.replace(/\\begin\{center\}/g, '<div style="text-align: center;">');
-        html = html.replace(/\\end\{center\}/g, '</div>');
+        // Remove extra whitespace and empty lines
+        html = html.replace(/\n\s*\n\s*\n/g, '\n\n');
+        html = html.replace(/^\s+|\s+$/gm, '');
         
-        // Convert sections
-        html = html.replace(/\\section\*\{([^}]+)\}/g, '<h2>$1</h2>');
-        html = html.replace(/\\subsection\*\{([^}]+)\}/g, '<h3>$1</h3>');
-        html = html.replace(/\\subsubsection\*\{([^}]+)\}/g, '<h4>$1</h4>');
-        
-        // Convert text formatting
-        html = html.replace(/\\textbf\{([^}]+)\}/g, '<strong>$1</strong>');
-        html = html.replace(/\\textit\{([^}]+)\}/g, '<em>$1</em>');
-        html = html.replace(/\\emph\{([^}]+)\}/g, '<em>$1</em>');
-        
-        // Convert font sizes
-        html = html.replace(/\\LARGE\s*([^\n]+)/g, '<h1>$1</h1>');
-        html = html.replace(/\\Large\s*([^\n]+)/g, '<h2>$1</h2>');
-        html = html.replace(/\\large\s*([^\n]+)/g, '<h3>$1</h3>');
-        
-        // Convert href links
-        html = html.replace(/\\href\{([^}]+)\}\{([^}]+)\}/g, '<a href="$1">$2</a>');
-        
-        // Convert vspace
-        html = html.replace(/\\vspace\{[^}]+\}/g, '<br>');
-        
-        // Convert itemize lists
-        html = html.replace(/\\begin\{itemize\}/g, '<ul>');
-        html = html.replace(/\\end\{itemize\}/g, '</ul>');
-        html = html.replace(/\\item\s*([^\n]*)/g, '<li>$1</li>');
-        
-        // Convert enumerate lists
-        html = html.replace(/\\begin\{enumerate\}/g, '<ol>');
-        html = html.replace(/\\end\{enumerate\}/g, '</ol>');
-        
-        // Convert line breaks
-        html = html.replace(/\\\\/g, '<br>');
-        
-        // Split into lines and process each line
+        // Split into lines and process
         let lines = html.split('\n');
         let processedLines = [];
+        let currentSection = '';
         let inList = false;
         
         for (let i = 0; i < lines.length; i++) {
@@ -151,46 +115,84 @@ class CVLoader {
                 continue;
             }
             
-            // Handle list items
-            if (line.startsWith('<li>') || line.startsWith('<ul>') || line.startsWith('</ul>') || 
-                line.startsWith('<ol>') || line.startsWith('</ol>')) {
-                inList = true;
-                processedLines.push(line);
-                if (line.startsWith('</ul>') || line.startsWith('</ol>')) {
+            // Skip lines that are just LaTeX remnants
+            if (line.match(/^[\\{}[\]]+$/) || line.match(/^[0-9\s\-\.]+$/)) {
+                continue;
+            }
+            
+            // Detect section headers (lines that are all caps or title case)
+            if (line.match(/^[A-Z][A-Z\s]+$/) || 
+                line.match(/^[A-Z][a-z]+\s+[A-Z][a-z]+$/) ||
+                line.match(/^[A-Z][a-z]+\s+[A-Z][a-z]+\s+[A-Z][a-z]+$/)) {
+                
+                if (inList) {
+                    processedLines.push('</ul>');
                     inList = false;
+                }
+                
+                // Clean up section name
+                let sectionName = line.replace(/[{}[\]]/g, '').trim();
+                processedLines.push(`<h2>${sectionName}</h2>`);
+                currentSection = sectionName;
+                continue;
+            }
+            
+            // Detect subsection headers (lines with specific patterns)
+            if (line.match(/^[A-Z][a-z]+\s+[A-Z][a-z]+$/) && 
+                (line.includes('Skills') || line.includes('Tools') || line.includes('Experience'))) {
+                
+                if (inList) {
+                    processedLines.push('</ul>');
+                    inList = false;
+                }
+                
+                let subsectionName = line.replace(/[{}[\]]/g, '').trim();
+                processedLines.push(`<h3>${subsectionName}</h3>`);
+                continue;
+            }
+            
+            // Handle list items (lines starting with bullet points or dashes)
+            if (line.match(/^[•\-\*]\s/) || line.match(/^[A-Z][a-z]+.*\d{4}/)) {
+                if (!inList) {
+                    processedLines.push('<ul>');
+                    inList = true;
+                }
+                
+                // Clean up list item
+                let item = line.replace(/^[•\-\*]\s*/, '').replace(/[{}[\]]/g, '').trim();
+                if (item.length > 0) {
+                    processedLines.push(`<li>${item}</li>`);
                 }
                 continue;
             }
             
-            // Handle headings
-            if (line.startsWith('<h1>') || line.startsWith('<h2>') || line.startsWith('<h3>') || 
-                line.startsWith('<h4>') || line.startsWith('<div')) {
-                inList = false;
-                processedLines.push(line);
-                continue;
-            }
-            
-            // Regular text lines
+            // Handle regular paragraphs
             if (!inList && line.length > 0) {
-                processedLines.push('<p>' + line + '</p>');
-            } else if (inList) {
-                processedLines.push(line);
+                // Clean up the line
+                let cleanLine = line.replace(/[{}[\]]/g, '').trim();
+                
+                // Skip lines that are just numbers or dates
+                if (cleanLine.match(/^\d{4}/) || cleanLine.match(/^[A-Z][a-z]+\s+\d{4}/)) {
+                    continue;
+                }
+                
+                if (cleanLine.length > 0) {
+                    processedLines.push(`<p>${cleanLine}</p>`);
+                }
             }
+        }
+        
+        // Close any open list
+        if (inList) {
+            processedLines.push('</ul>');
         }
         
         html = processedLines.join('\n');
         
-        // Clean up empty paragraphs and fix formatting
+        // Final cleanup
         html = html.replace(/<p><\/p>/g, '');
         html = html.replace(/<p>\s*<\/p>/g, '');
-        html = html.replace(/<p>\s*<h/g, '<h');
-        html = html.replace(/<\/h([1-6])>\s*<\/p>/g, '</h$1>');
-        html = html.replace(/<p>\s*<ul>/g, '<ul>');
-        html = html.replace(/<\/ul>\s*<\/p>/g, '</ul>');
-        html = html.replace(/<p>\s*<ol>/g, '<ol>');
-        html = html.replace(/<\/ol>\s*<\/p>/g, '</ol>');
-        html = html.replace(/<p>\s*<div/g, '<div');
-        html = html.replace(/<\/div>\s*<\/p>/g, '</div>');
+        html = html.replace(/<br>\s*<br>\s*<br>/g, '<br><br>');
         
         return html;
     }
